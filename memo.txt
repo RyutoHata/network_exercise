@@ -1,0 +1,31 @@
+
+問３httpサーバ
+　ウェブブラウザでlocalhostにアクセスしたところ、apacheが立ち上がった
+しょうがないので9999ポート指定でサーバプログラム（一つ前のTimeServer）を立ち上げて、ブラウザからアクセス
+サーバの方では時間が９回表示された。
+ということは、ブラウザのほうから９行のテキストが送られていることが分かる。
+サーバに送られてくる情報を見ると以下のようになっている。
+GET / HTTP/1.1
+Host: localhost:9999
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:53.0) Gecko/20100101 Firefox/53.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+一方、clinet(ブラウザ)のほうはサーバを止めると画面に文字が現れる。しかも9回
+ということは、ブラウザの方が、何かの接続が終了するまでデータを画面に出さないのかもしれない
+どうやらHTTPのバージョンが1.1であるためKeep-Aliveが働いているみたい。
+Keep-Aliveの説明はのちほど
+試しに、whileによるループをなくしてみる。
+クライアント側の処理はうまく行った。
+サーバ側では
+GET / HTTP/1.1のみが表示された。（そりゃそうだ）
+このままだとサーバで全てのリクエストを受け取れていないのでwhileの条件式をちょっと工夫する。（助けてGoogle先生!）
+先生によると、受け取ったデータがnullかつ空ならHTTPリクエストのヘッダが終了していることを判定できるらしい
+で、うまくいきましたー
+while文だと初回の読み込みを書かなければいけないのでdo whileに変更
+ただ、このままだとリクエストの判定をしているわけではないので、自前のクライアントで謎の文章を送っても"Hello!"を返す気がする。
+
+
